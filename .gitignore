@@ -22,3 +22,29 @@ lerna-debug.log*
 # temp directory
 .temp
 .tmp
+# TypeScript
+*.tsbuildinfo
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage/
+.nyc_output/
+
+# Prisma
+prisma/migrations/
+!prisma/migrations/.gitkeep
+
+# Docker
+docker-compose.override.yml
+
+/src/generated/prisma
