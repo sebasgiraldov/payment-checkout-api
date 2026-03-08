@@ -84,6 +84,7 @@ export class Container {
 
     this.processPaymentUseCase = new ProcessPaymentUseCase(
       this.transactionRepository,
+      this.productRepository,
       this.paymentGateway
     );
 

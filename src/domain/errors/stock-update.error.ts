@@ -1,10 +1,14 @@
 import { ApplicationError } from './application.error';
 
 /**
- * StockUpdateError represents a failure during product stock update
+ * Stock Update Error
+ *
+ * Thrown when stock update operations fail.
+ * This includes failures to decrease stock or persist stock changes.
  */
 export class StockUpdateError extends ApplicationError {
-  constructor(message: string, context?: Record<string, any>) {
-    super(`Failed to update stock: ${message}`, context);
+  constructor(message: string, metadata?: Record<string, unknown>) {
+    super(message, metadata);
+    this.name = 'StockUpdateError';
   }
 }

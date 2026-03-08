@@ -1,9 +1,5 @@
 import { Router } from 'express';
-import { ProductController } from '../controllers/product.controller';
-import { GetAllProductsUseCase } from '../../application/use-cases/get-all-products.use-case';
-import { GetProductByIdUseCase } from '../../application/use-cases/get-product-by-id.use-case';
-import { ProductRepositoryAdapter } from '../../infrastructure/repositories/product.repository.adapter';
-import { PrismaService } from '../../infrastructure/database/prisma.service';
+import { container } from '../../container';
 
 /**
  * Product Routes
@@ -14,12 +10,8 @@ import { PrismaService } from '../../infrastructure/database/prisma.service';
  */
 const router = Router();
 
-// Initialize dependencies
-const prismaService = new PrismaService();
-const productRepository = new ProductRepositoryAdapter(prismaService);
-const getAllProductsUseCase = new GetAllProductsUseCase(productRepository);
-const getProductByIdUseCase = new GetProductByIdUseCase(productRepository);
-const productController = new ProductController(getAllProductsUseCase, getProductByIdUseCase);
+// Get controller from container (singleton pattern)
+const productController = container.productController;
 
 /**
  * GET /api/v1/products
