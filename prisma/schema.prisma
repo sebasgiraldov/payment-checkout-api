@@ -1,0 +1,90 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TransactionStatus {
+  PENDING
+  APPROVED
+  DECLINED
+  FAILED
+}
+
+model Product {
+  id           String        @id @default(uuid())
+  name         String
+  description  String
+  price        Decimal       @db.Decimal(10, 2)
+  currency     String        @db.VarChar(3)
+  stock        Int
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  transactions Transaction[]
+
+  @@map("products")
+}
+
+model Customer {
+  id           String        @id @default(uuid())
+  name         String
+  email        String        @unique
+  phone        String
+  createdAt    DateTime      @default(now()) @map("created_at")
+  transactions Transaction[]
+  deliveries   Delivery[]
+
+  @@map("customers")
+}
+
+model Delivery {
+  id          String       @id @default(uuid())
+  customerId  String       @map("customer_id")
+  address     String
+  city        String
+  state       String?
+  country     String
+  postalCode  String       @map("postal_code")
+  deliveryFee Decimal      @map("delivery_fee") @db.Decimal(10, 2)
+  currency    String       @db.VarChar(3)
+  createdAt   DateTime     @default(now()) @map("created_at")
+  customer    Customer     @relation(fields: [customerId], references: [id])
+  transaction Transaction?
+
+  @@map("deliveries")
+}
+
+model Transaction {
+  id                String            @id @default(uuid())
+  productId         String            @map("product_id")
+  customerId        String            @map("customer_id")
+  deliveryId        String            @unique @map("delivery_id")
+  amount            Decimal           @db.Decimal(10, 2)
+  baseFee           Decimal           @map("base_fee") @db.Decimal(10, 2)
+  deliveryFee       Decimal           @map("delivery_fee") @db.Decimal(10, 2)
+  totalAmount       Decimal           @map("total_amount") @db.Decimal(10, 2)
+  currency          String            @db.VarChar(3)
+  status            TransactionStatus
+  paymentMethod     String            @map("payment_method")
+  externalPaymentId String?           @unique @map("external_payment_id")
+  createdAt         DateTime          @default(now()) @map("created_at")
+  updatedAt         DateTime          @updatedAt @map("updated_at")
+  product           Product           @relation(fields: [productId], references: [id])
+  customer          Customer          @relation(fields: [customerId], references: [id])
+  delivery          Delivery          @relation(fields: [deliveryId], references: [id])
+
+  @@index([productId])
+  @@index([customerId])
+  @@index([status])
+  @@index([externalPaymentId])
+  @@map("transactions")
+}
