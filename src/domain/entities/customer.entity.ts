@@ -67,7 +67,7 @@ export class Customer {
     }
 
     // Validate email format (Requirement 3.2)
-    const emailResult = props.email instanceof Email 
+    const emailResult: Result<Email, DomainError> = props.email instanceof Email 
       ? Result.ok(props.email)
       : Email.create(props.email);
     if (emailResult.isFailure) {
@@ -75,7 +75,7 @@ export class Customer {
     }
 
     // Validate phone format (Requirement 3.3)
-    const phoneResult = props.phone instanceof Phone
+    const phoneResult: Result<Phone, DomainError> = props.phone instanceof Phone
       ? Result.ok(props.phone)
       : Phone.create(props.phone);
     if (phoneResult.isFailure) {
