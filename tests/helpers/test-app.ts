@@ -4,7 +4,6 @@ import { ProductRepositoryAdapter } from '../../src/infrastructure/repositories/
 import { TransactionRepositoryAdapter } from '../../src/infrastructure/repositories/transaction.repository.adapter';
 import { CustomerRepositoryAdapter } from '../../src/infrastructure/repositories/customer.repository.adapter';
 import { DeliveryRepositoryAdapter } from '../../src/infrastructure/repositories/delivery.repository.adapter';
-import { DatabaseTransactionAdapter } from '../../src/infrastructure/repositories/database-transaction.adapter';
 import { GetAllProductsUseCase } from '../../src/application/use-cases/get-all-products.use-case';
 import { GetProductByIdUseCase } from '../../src/application/use-cases/get-product-by-id.use-case';
 import { CreateTransactionUseCase } from '../../src/application/use-cases/create-transaction.use-case';
@@ -31,18 +30,17 @@ export function createTestApp(mockPaymentGateway?: IPaymentGateway): Express {
   app.use(express.urlencoded({ extended: true }));
 
   // Add correlation ID for testing
-  app.use((req: Request, res: Response, next: NextFunction) => {
+  app.use((req: Request, _res: Response, next: NextFunction) => {
     req.correlationId = req.headers['x-correlation-id'] as string || 'test-correlation-id';
     next();
   });
 
   // Initialize repositories
-  const prismaService = new PrismaService();
+  const prismaService = PrismaService.getInstance();
   const productRepository = new ProductRepositoryAdapter(prismaService);
   const transactionRepository = new TransactionRepositoryAdapter(prismaService);
   const customerRepository = new CustomerRepositoryAdapter(prismaService);
   const deliveryRepository = new DeliveryRepositoryAdapter(prismaService);
-  const databaseTransaction = new DatabaseTransactionAdapter(prismaService);
 
   // Initialize use cases
   const getAllProductsUseCase = new GetAllProductsUseCase(productRepository);
@@ -58,7 +56,10 @@ export function createTestApp(mockPaymentGateway?: IPaymentGateway): Express {
   // Initialize controllers
   const productController = new ProductController(getAllProductsUseCase, getProductByIdUseCase);
   const transactionController = new TransactionController(createTransactionUseCase, getTransactionByIdUseCase);
-  const healthController = new HealthController(prismaService, mockPaymentGateway);
+  
+  // Create a mock payment gateway if not provided
+  const paymentGateway = mockPaymentGateway || ({} as IPaymentGateway);
+  const healthController = new HealthController(prismaService, paymentGateway as any);
 
   // Product routes
   app.get('/api/v1/products', (req, res, next) => productController.getAllProducts(req, res, next));
@@ -73,18 +74,17 @@ export function createTestApp(mockPaymentGateway?: IPaymentGateway): Express {
     const processPaymentUseCase = new ProcessPaymentUseCase(
       transactionRepository,
       productRepository,
-      mockPaymentGateway,
-      databaseTransaction
+      mockPaymentGateway
     );
     const paymentController = new PaymentController(processPaymentUseCase);
     app.post('/api/v1/payments/process', (req, res, next) => paymentController.processPayment(req, res, next));
   }
 
   // Health route
-  app.get('/health', (req, res, next) => healthController.checkHealth(req, res, next));
+  app.get('/health', (req, res) => healthController.checkHealth(req, res));
 
   // Error handling middleware
-  app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
     if (err instanceof ProductNotFoundError) {
       return res.status(404).json({
         success: false,
@@ -132,5 +132,5 @@ export function createTestApp(mockPaymentGateway?: IPaymentGateway): Express {
  * Gets a Prisma service instance for test database operations
  */
 export function getTestPrismaService(): PrismaService {
-  return new PrismaService();
+  return PrismaService.getInstance();
 }

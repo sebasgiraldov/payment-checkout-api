@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { PrismaService } from '../../infrastructure/database/prisma.service';
 import { WompiPaymentAdapter } from '../../infrastructure/payment/wompi-payment.adapter';
 import { logger } from '../../shared/utils/logger';
@@ -29,7 +29,7 @@ export class HealthController {
    *
    * **Validates: Requirements 17.5, 20.3**
    */
-  async checkHealth(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async checkHealth(req: Request, res: Response): Promise<void> {
     const startTime = Date.now();
     const timestamp = new Date().toISOString();
 

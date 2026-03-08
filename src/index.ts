@@ -48,12 +48,12 @@ async function bootstrap(): Promise<void> {
       if (error.code === 'EADDRINUSE') {
         logger.error(`❌ Port ${config.port} is already in use`);
       } else {
-        logger.error('❌ Server error:', error);
+        logger.error('❌ Server error', { error: error.message, stack: error.stack });
       }
       process.exit(1);
     });
   } catch (error) {
-    logger.error('❌ Failed to start application:', error);
+    logger.error('❌ Failed to start application', { error: error instanceof Error ? error.message : String(error) });
     process.exit(1);
   }
 }
@@ -73,7 +73,7 @@ async function gracefulShutdown(signal: string): Promise<void> {
       await new Promise<void>((resolve, reject) => {
         server!.close((err) => {
           if (err) {
-            logger.error('❌ Error closing server:', err);
+            logger.error('❌ Error closing server', { error: err.message, stack: err.stack });
             reject(err);
           } else {
             logger.info('✅ HTTP server closed');
@@ -91,7 +91,7 @@ async function gracefulShutdown(signal: string): Promise<void> {
     logger.info('✅ Graceful shutdown completed');
     process.exit(0);
   } catch (error) {
-    logger.error('❌ Error during graceful shutdown:', error);
+    logger.error('❌ Error during graceful shutdown', { error: error instanceof Error ? error.message : String(error) });
     process.exit(1);
   }
 }
@@ -102,18 +102,18 @@ process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (error: Error) => {
-  logger.error('❌ Uncaught exception:', error);
+  logger.error('❌ Uncaught exception', { error: error.message, stack: error.stack });
   gracefulShutdown('UNCAUGHT_EXCEPTION');
 });
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (reason: any) => {
-  logger.error('❌ Unhandled promise rejection:', reason);
+  logger.error('❌ Unhandled promise rejection', { reason: reason instanceof Error ? reason.message : String(reason) });
   gracefulShutdown('UNHANDLED_REJECTION');
 });
 
 // Start the application
 bootstrap().catch((error) => {
-  logger.error('❌ Unhandled error during bootstrap:', error);
+  logger.error('❌ Unhandled error during bootstrap', { error: error instanceof Error ? error.message : String(error) });
   process.exit(1);
 });

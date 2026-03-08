@@ -50,14 +50,11 @@ export class CreateTransactionUseCase {
     const product = productResult.value;
     if (!product.hasStock(1)) {
       return Result.fail(
-        new ApplicationError(
-          `Product ${product.id} has insufficient stock. Available: ${product.stock}, Required: 1`,
-          {
-            productId: product.id,
-            availableStock: product.stock,
-            requiredStock: 1,
-          }
-        ) as InsufficientStockError
+        new InsufficientStockError(
+          product.id,
+          product.stock,
+          1
+        )
       );
     }
 

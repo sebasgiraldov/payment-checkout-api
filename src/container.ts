@@ -101,7 +101,7 @@ export class Container {
 
     this.paymentController = new PaymentController(this.processPaymentUseCase);
 
-    this.healthController = new HealthController(this.prismaService);
+    this.healthController = new HealthController(this.prismaService, this.paymentGateway);
   }
 
   /**

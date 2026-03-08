@@ -126,7 +126,7 @@ export class DeliveryRepositoryAdapter implements IDeliveryRepository {
    * @private
    */
   private mapToDomain(model: PrismaDelivery): Result<Delivery, RepositoryError> {
-    const deliveryFeeResult = Money.create(model.deliveryFee, model.currency);
+    const deliveryFeeResult = Money.create(Number(model.deliveryFee), model.currency);
 
     if (deliveryFeeResult.isFailure) {
       return Result.fail(
@@ -143,7 +143,7 @@ export class DeliveryRepositoryAdapter implements IDeliveryRepository {
       customerId: model.customerId,
       address: model.address,
       city: model.city,
-      state: model.state,
+      state: model.state || '',
       country: model.country,
       postalCode: model.postalCode,
       deliveryFee: deliveryFeeResult.value,
