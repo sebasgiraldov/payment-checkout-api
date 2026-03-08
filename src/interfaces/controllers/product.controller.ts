@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { GetAllProductsUseCase } from '../../application/use-cases/get-all-products.use-case';
 import { GetProductByIdUseCase } from '../../application/use-cases/get-product-by-id.use-case';
-import { ProductDto } from '../../application/dtos/product.dto';
 import { logger } from '../../shared/utils/logger';
 
 /**

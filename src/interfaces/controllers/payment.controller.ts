@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { ProcessPaymentUseCase } from '../../application/use-cases/process-payment.use-case';
-import { ProcessPaymentDto, PaymentResultDto } from '../../application/dtos/transaction.dto';
+import { ProcessPaymentDto } from '../../application/dtos/transaction.dto';
 import { logger } from '../../shared/utils/logger';
 
 /**

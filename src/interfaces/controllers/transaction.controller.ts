@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { CreateTransactionUseCase } from '../../application/use-cases/create-transaction.use-case';
 import { GetTransactionByIdUseCase } from '../../application/use-cases/get-transaction-by-id.use-case';
-import { CreateTransactionDto, TransactionDto } from '../../application/dtos/transaction.dto';
+import { CreateTransactionDto } from '../../application/dtos/transaction.dto';
 import { logger } from '../../shared/utils/logger';
 
 /**

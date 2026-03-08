@@ -24,11 +24,7 @@ export class GetAllProductsUseCase {
     const productsResult = await this.productRepository.findAll();
 
     if (productsResult.isFailure) {
-      return Result.fail(
-        new ApplicationError(productsResult.error.message, {
-          error: productsResult.error,
-        })
-      );
+      return Result.fail(productsResult.error);
     }
 
     const products = productsResult.value;

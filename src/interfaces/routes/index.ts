@@ -1,5 +1,4 @@
-import { Router, Application } from 'express';
-import { Container } from '../../container';
+import { Application } from 'express';
 import { productRoutes } from './product.routes';
 import { transactionRoutes } from './transaction.routes';
 import { paymentRoutes } from './payment.routes';
@@ -24,9 +23,8 @@ import { healthRoutes } from './health.routes';
  * - /health - Health check endpoint
  *
  * @param app - Express application instance
- * @param container - Dependency injection container
  */
-export function registerRoutes(app: Application, container: Container): void {
+export function registerRoutes(app: Application): void {
   // API v1 routes
   app.use('/api/v1/products', productRoutes);
   app.use('/api/v1/transactions', transactionRoutes);

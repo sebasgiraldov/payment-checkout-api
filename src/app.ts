@@ -9,7 +9,6 @@ import {
   errorHandlerMiddleware,
   generalRateLimiter,
 } from './interfaces/middleware';
-import { container } from './container';
 
 /**
  * Creates and configures the Express application
@@ -43,7 +42,7 @@ export function createApp(): Application {
   app.use(generalRateLimiter);
 
   // Register all application routes
-  registerRoutes(app, container);
+  registerRoutes(app);
 
   // Error handling middleware (must be last)
   app.use(errorHandlerMiddleware);

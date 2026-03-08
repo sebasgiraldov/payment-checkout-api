@@ -4,12 +4,6 @@ import {
   ApplicationError,
   ProductNotFoundError,
   TransactionNotFoundError,
-  CustomerCreationError,
-  DeliveryCreationError,
-  TransactionCreationError,
-  TransactionUpdateError,
-  PaymentProcessingError,
-  StockUpdateError,
   DomainError,
   ValidationError,
   InsufficientStockError,
@@ -31,7 +25,7 @@ export function errorHandlerMiddleware(
   error: Error,
   req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ): void {
   const correlationId = req.correlationId || 'unknown';
 
@@ -117,7 +111,6 @@ function mapErrorToHttpResponse(
         message: error.message,
         details: {
           currentState: error.currentState,
-          attemptedState: error.attemptedState,
         },
       },
     };

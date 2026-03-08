@@ -1,7 +1,5 @@
 import { Router } from 'express';
-import { HealthController } from '../controllers/health.controller';
-import { PrismaService } from '../../infrastructure/database/prisma.service';
-import { WompiPaymentAdapter } from '../../infrastructure/payment/wompi-payment.adapter';
+import { container } from '../../container';
 
 /**
  * Health Check Routes
@@ -12,19 +10,8 @@ import { WompiPaymentAdapter } from '../../infrastructure/payment/wompi-payment.
  */
 const router = Router();
 
-// Initialize dependencies
-const prismaService = new PrismaService();
-
-// Initialize payment gateway adapter for health checks
-const wompiConfig = {
-  baseUrl: process.env.WOMPI_BASE_URL || 'https://sandbox.wompi.co/v1',
-  publicKey: process.env.WOMPI_PUBLIC_KEY || '',
-  privateKey: process.env.WOMPI_PRIVATE_KEY || '',
-  integrityKey: process.env.WOMPI_INTEGRITY_KEY || '',
-};
-const paymentAdapter = new WompiPaymentAdapter(wompiConfig);
-
-const healthController = new HealthController(prismaService, paymentAdapter);
+// Get controller from container (singleton pattern)
+const healthController = container.healthController;
 
 /**
  * GET /health
@@ -41,7 +28,7 @@ const healthController = new HealthController(prismaService, paymentAdapter);
  *
  * **Validates: Requirements 17.5, 20.3**
  */
-router.get('/', (req, res, next) => healthController.checkHealth(req, res, next));
+router.get('/', (req, res) => healthController.checkHealth(req, res));
 
 export { router as healthRoutes };
 export default router;
