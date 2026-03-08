@@ -5,8 +5,8 @@ import {
   CORRELATION_ID_HEADER,
 } from '../correlation-id.middleware';
 
-// Mock uuid module
-jest.mock('../../shared/utils/generate-id', () => ({
+// Mock generateId
+jest.mock('../../../shared/utils/generate-id', () => ({
   generateId: jest.fn(() => '550e8400-e29b-41d4-a716-446655440000'),
 }));
 

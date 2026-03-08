@@ -1,10 +1,5 @@
 import { generateId } from '../generate-id';
 
-// Mock uuid module
-jest.mock('uuid', () => ({
-  v4: jest.fn(() => '550e8400-e29b-41d4-a716-446655440000'),
-}));
-
 describe('generateId', () => {
   it('should generate a valid UUID v4', () => {
     const id = generateId();
