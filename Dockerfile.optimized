@@ -1,22 +1,33 @@
-# Multi-stage Dockerfile for Payment Checkout API
-# Stage 1: Builder - Install dependencies and build application
-FROM node:18-alpine AS builder
+# Multi-stage Dockerfile for Payment Checkout API (Optimized)
+# Stage 1: Dependencies - Install and cache dependencies
+FROM node:18-alpine AS deps
 
-# Install OpenSSL (required by Prisma) and other necessary packages
+# Install OpenSSL (required by Prisma)
 RUN apk add --no-cache openssl libc6-compat
 
-# Set working directory
 WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
 COPY prisma ./prisma/
 
-# Install all dependencies (including dev dependencies for build)
+# Install dependencies
 RUN npm ci
 
-# Generate Prisma Client (must be done after npm ci)
+# Generate Prisma Client
 RUN npx prisma generate
+
+# Stage 2: Builder - Build application
+FROM node:18-alpine AS builder
+
+# Install OpenSSL
+RUN apk add --no-cache openssl libc6-compat
+
+WORKDIR /app
+
+# Copy dependencies from deps stage
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/package*.json ./
 
 # Copy source code
 COPY . .
@@ -24,11 +35,11 @@ COPY . .
 # Build TypeScript application
 RUN npm run build
 
-# Stage 2: Production - Create minimal production image
+# Stage 3: Production - Create minimal production image
 FROM node:18-alpine AS production
 
 # Install OpenSSL (required by Prisma at runtime)
-RUN apk add --no-cache openssl libc6-compat
+RUN apk add --no-cache openssl libc6-compat dumb-init
 
 # Set working directory
 WORKDIR /app
@@ -36,6 +47,9 @@ WORKDIR /app
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nodejs -u 1001
+
+# Set NODE_ENV
+ENV NODE_ENV=production
 
 # Copy package files
 COPY package*.json ./
@@ -49,7 +63,7 @@ RUN npm ci --only=production && \
 RUN npx prisma generate
 
 # Copy built application from builder stage
-COPY --chown=nodejs:nodejs --from=builder /app/dist ./dist
+COPY --from=builder /app/dist ./dist
 
 # Change ownership of all files to nodejs user
 RUN chown -R nodejs:nodejs /app
@@ -63,6 +77,9 @@ EXPOSE 3000
 # Health check configuration
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
     CMD node -e "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
+
+# Use dumb-init to handle signals properly
+ENTRYPOINT ["dumb-init", "--"]
 
 # Run migrations and start application
 CMD ["sh", "-c", "npx prisma migrate deploy && node dist/index.js"]
