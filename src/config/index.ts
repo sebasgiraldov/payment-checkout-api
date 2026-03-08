@@ -2,6 +2,7 @@ export interface AppConfig {
   nodeEnv: string;
   port: number;
   apiVersion: string;
+  baseUrl?: string;
   database: {
     url: string;
   };
@@ -46,6 +47,7 @@ export function loadConfig(): AppConfig {
     nodeEnv: getEnvVar('NODE_ENV', 'development'),
     port: getEnvVarAsNumber('PORT', 3000),
     apiVersion: getEnvVar('API_VERSION', 'v1'),
+    baseUrl: process.env.BASE_URL,
     database: {
       url: getEnvVar('DATABASE_URL'),
     },

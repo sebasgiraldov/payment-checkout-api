@@ -37,10 +37,11 @@ async function bootstrap(): Promise<void> {
 
     // Start HTTP server
     // Bind to 0.0.0.0 to accept connections from outside the container
+    const baseUrl = config.baseUrl || `http://localhost:${config.port}`;
     server = app.listen(config.port, '0.0.0.0', () => {
       logger.info(`✅ Server is running on port ${config.port}`);
-      logger.info(`🌐 Health check: http://localhost:${config.port}/health`);
-      logger.info(`🌐 API endpoint: http://localhost:${config.port}/api/${config.apiVersion}`);
+      logger.info(`🌐 Health check: ${baseUrl}/health`);
+      logger.info(`🌐 API endpoint: ${baseUrl}/api/${config.apiVersion}`);
       logger.info('🎉 Payment Checkout API is ready to accept requests');
     });
 
