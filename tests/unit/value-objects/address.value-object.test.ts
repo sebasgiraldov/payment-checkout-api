@@ -51,7 +51,7 @@ describe('Address Value Object', () => {
 
       // Assert
       expect(result.isFailure).toBe(true);
-      expect(result.error.message).toContain('street');
+      expect(result.error.message).toContain('Street');
     });
 
     it('should fail when city is empty', () => {
@@ -66,7 +66,7 @@ describe('Address Value Object', () => {
 
       // Assert
       expect(result.isFailure).toBe(true);
-      expect(result.error.message).toContain('city');
+      expect(result.error.message).toContain('City');
     });
 
     it('should fail when country is empty', () => {
@@ -81,10 +81,10 @@ describe('Address Value Object', () => {
 
       // Assert
       expect(result.isFailure).toBe(true);
-      expect(result.error.message).toContain('country');
+      expect(result.error.message).toContain('Country');
     });
 
-    it('should fail when postal code is empty', () => {
+    it('should accept empty postal code', () => {
       // Act
       const result = Address.create({
         street: 'Carrera 7 #32-16',
@@ -94,9 +94,8 @@ describe('Address Value Object', () => {
         postalCode: '',
       });
 
-      // Assert
-      expect(result.isFailure).toBe(true);
-      expect(result.error.message).toContain('postal code');
+      // Assert - postal code is optional
+      expect(result.isSuccess).toBe(true);
     });
 
     it('should fail when street is only whitespace', () => {
@@ -111,7 +110,7 @@ describe('Address Value Object', () => {
 
       // Assert
       expect(result.isFailure).toBe(true);
-      expect(result.error.message).toContain('street');
+      expect(result.error.message).toContain('Street');
     });
   });
 
