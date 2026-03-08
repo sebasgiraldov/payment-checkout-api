@@ -107,6 +107,20 @@ export class Delivery {
   }
 
   /**
+   * Gets the delivery city
+   */
+  get city(): string {
+    return this._address.city;
+  }
+
+  /**
+   * Gets the delivery state
+   */
+  get state(): string {
+    return this._address.state;
+  }
+
+  /**
    * Gets the delivery fee
    */
   get deliveryFee(): Money {

@@ -11,8 +11,8 @@ import { generateId } from '../../shared/utils/generate-id';
 export interface CustomerProps {
   id?: string;
   name: string;
-  email: string;
-  phone: string;
+  email: string | Email;
+  phone: string | Phone;
   createdAt?: Date;
 }
 
@@ -67,13 +67,17 @@ export class Customer {
     }
 
     // Validate email format (Requirement 3.2)
-    const emailResult = Email.create(props.email);
+    const emailResult = props.email instanceof Email 
+      ? Result.ok(props.email)
+      : Email.create(props.email);
     if (emailResult.isFailure) {
       return Result.fail(emailResult.error);
     }
 
     // Validate phone format (Requirement 3.3)
-    const phoneResult = Phone.create(props.phone);
+    const phoneResult = props.phone instanceof Phone
+      ? Result.ok(props.phone)
+      : Phone.create(props.phone);
     if (phoneResult.isFailure) {
       return Result.fail(phoneResult.error);
     }
