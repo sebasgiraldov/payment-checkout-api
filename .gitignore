@@ -41,7 +41,7 @@ coverage/
 .nyc_output/
 
 # Prisma
-prisma/migrations/
+# Keep migrations in version control for deployment
 !prisma/migrations/.gitkeep
 
 # Docker
