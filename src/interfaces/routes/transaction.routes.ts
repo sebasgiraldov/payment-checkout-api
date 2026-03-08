@@ -1,14 +1,7 @@
 import { Router } from 'express';
-import { TransactionController } from '../controllers/transaction.controller';
-import { CreateTransactionUseCase } from '../../application/use-cases/create-transaction.use-case';
-import { GetTransactionByIdUseCase } from '../../application/use-cases/get-transaction-by-id.use-case';
 import { validateDto } from '../middleware/validation.middleware';
 import { CreateTransactionDto } from '../../application/dtos/transaction.dto';
-import { TransactionRepositoryAdapter } from '../../infrastructure/repositories/transaction.repository.adapter';
-import { ProductRepositoryAdapter } from '../../infrastructure/repositories/product.repository.adapter';
-import { CustomerRepositoryAdapter } from '../../infrastructure/repositories/customer.repository.adapter';
-import { DeliveryRepositoryAdapter } from '../../infrastructure/repositories/delivery.repository.adapter';
-import { PrismaService } from '../../infrastructure/database/prisma.service';
+import { container } from '../../container';
 
 /**
  * Transaction Routes
@@ -19,25 +12,8 @@ import { PrismaService } from '../../infrastructure/database/prisma.service';
  */
 const router = Router();
 
-// Initialize dependencies
-const prismaService = new PrismaService();
-const transactionRepository = new TransactionRepositoryAdapter(prismaService);
-const productRepository = new ProductRepositoryAdapter(prismaService);
-const customerRepository = new CustomerRepositoryAdapter(prismaService);
-const deliveryRepository = new DeliveryRepositoryAdapter(prismaService);
-
-const createTransactionUseCase = new CreateTransactionUseCase(
-  transactionRepository,
-  productRepository,
-  customerRepository,
-  deliveryRepository
-);
-const getTransactionByIdUseCase = new GetTransactionByIdUseCase(transactionRepository);
-
-const transactionController = new TransactionController(
-  createTransactionUseCase,
-  getTransactionByIdUseCase
-);
+// Get controller from container (singleton pattern)
+const transactionController = container.transactionController;
 
 /**
  * POST /api/v1/transactions
