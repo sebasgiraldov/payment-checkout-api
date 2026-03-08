@@ -44,4 +44,15 @@ export class Phone {
 
     return Result.ok(new Phone(cleaned));
   }
+
+  /**
+   * Compare two Phone instances for equality
+   *
+   * @param other - The other Phone instance to compare
+   * @returns true if phones are equal, false otherwise
+   */
+  equals(other: Phone): boolean {
+    if (!other) return false;
+    return this.value === other.value;
+  }
 }

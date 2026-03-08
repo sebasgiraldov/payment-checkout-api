@@ -82,6 +82,36 @@ export class Address {
   toString(): string {
     return `${this.street}, ${this.city}, ${this.state}, ${this.country} ${this.postalCode}`;
   }
+
+  /**
+   * Returns the full address as a formatted string
+   *
+   * @returns Full address string
+   */
+  getFullAddress(): string {
+    const parts = [this.street, this.city];
+    if (this.state) parts.push(this.state);
+    parts.push(this.country);
+    if (this.postalCode) parts.push(this.postalCode);
+    return parts.join(', ');
+  }
+
+  /**
+   * Compare two Address instances for equality
+   *
+   * @param other - The other Address instance to compare
+   * @returns true if addresses are equal, false otherwise
+   */
+  equals(other: Address): boolean {
+    if (!other) return false;
+    return (
+      this.street === other.street &&
+      this.city === other.city &&
+      this.state === other.state &&
+      this.country === other.country &&
+      this.postalCode === other.postalCode
+    );
+  }
 }
 
 /**

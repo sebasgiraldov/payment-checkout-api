@@ -29,10 +29,6 @@ module.exports = {
   transform: {
     '^.+\\.ts$': 'ts-jest',
   },
-  transformIgnorePatterns: ['node_modules/(?!(uuid)/)'],
-  moduleNameMapper: {
-    '^uuid$': '<rootDir>/node_modules/uuid/dist/index.js',
-  },
   testTimeout: 10000,
   verbose: true,
   detectOpenHandles: true,

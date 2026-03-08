@@ -44,4 +44,15 @@ export class Email {
     // Normalize email to lowercase (Requirement 3.2)
     return Result.ok(new Email(email.toLowerCase()));
   }
+
+  /**
+   * Compare two Email instances for equality
+   *
+   * @param other - The other Email instance to compare
+   * @returns true if emails are equal, false otherwise
+   */
+  equals(other: Email): boolean {
+    if (!other) return false;
+    return this.value === other.value;
+  }
 }
