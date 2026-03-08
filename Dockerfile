@@ -18,8 +18,9 @@ RUN npm ci
 # Generate Prisma Client (without requiring DATABASE_URL)
 RUN npx prisma generate
 
-# Copy source code
-COPY . .
+# Copy ONLY source code (not .env files)
+COPY src ./src
+COPY tsconfig.json ./
 
 # Build TypeScript application
 RUN npm run build

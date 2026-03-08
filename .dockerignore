@@ -5,10 +5,19 @@ npm-debug.log
 # Build output
 dist
 
-# Environment files
+# Environment files (CRITICAL: Don't copy ANY .env files to Docker)
+# Railway will inject environment variables at runtime
+.env*
+*.env
 .env
 .env.local
-.env.*.local
+.env.development
+.env.staging
+.env.production
+.env.test
+.env.example
+.env.staging.example
+.env.production.example
 
 # Git
 .git

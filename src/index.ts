@@ -36,7 +36,8 @@ async function bootstrap(): Promise<void> {
     logger.info('✅ Express application initialized');
 
     // Start HTTP server
-    server = app.listen(config.port, () => {
+    // Bind to 0.0.0.0 to accept connections from outside the container
+    server = app.listen(config.port, '0.0.0.0', () => {
       logger.info(`✅ Server is running on port ${config.port}`);
       logger.info(`🌐 Health check: http://localhost:${config.port}/health`);
       logger.info(`🌐 API endpoint: http://localhost:${config.port}/api/${config.apiVersion}`);
