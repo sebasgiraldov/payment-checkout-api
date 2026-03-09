@@ -574,7 +574,7 @@ This project includes comprehensive test coverage with unit tests, integration t
 
 ### Test Coverage
 
-![Test Coverage](./coverage/coverage-summary.png)
+![Test Coverage](./CoverageReport.png)
 
 Current coverage metrics:
 - **Statements**: 68%+
