@@ -57,4 +57,16 @@ export interface IProductRepository {
    * **Validates: Requirements 2.2**
    */
   updateStock(productId: string, newStock: number): Promise<Result<void, RepositoryError>>;
+
+  /**
+   * Atomically reserves stock for a product (decrements stock)
+   * Uses database-level conditional update to prevent race conditions
+   *
+   * @param productId - The product UUID
+   * @param quantity - The quantity to reserve (must be positive)
+   * @returns Result indicating success or RepositoryError if insufficient stock or database error
+   *
+   * **Validates: Requirements 2.2, 2.3 (prevents overselling)**
+   */
+  reserveStock(productId: string, quantity: number): Promise<Result<void, RepositoryError>>;
 }

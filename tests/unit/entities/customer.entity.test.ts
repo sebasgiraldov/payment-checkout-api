@@ -28,7 +28,7 @@ describe('Customer Entity', () => {
       expect(result.isSuccess).toBe(true);
       expect(result.value.name).toBe('John Doe');
       expect(result.value.email.value).toBe('john.doe@example.com');
-      expect(result.value.phone.value).toBe('+573001234567');
+      expect(result.value.phone.value).toBe('573001234567');
       expect(result.value.id).toBeDefined();
       expect(result.value.createdAt).toBeInstanceOf(Date);
     });

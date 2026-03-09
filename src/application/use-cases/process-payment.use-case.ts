@@ -6,7 +6,6 @@ import { IPaymentGateway, PaymentRequest } from '../../domain/services/payment-g
 import { TransactionStatus } from '../../domain/entities/transaction.entity';
 import { TransactionNotFoundError } from '../../domain/errors/transaction-not-found.error';
 import { PaymentProcessingError } from '../../domain/errors/payment-processing.error';
-import { InvalidStateTransitionError } from '../../domain/errors/invalid-state-transition.error';
 import { ApplicationError } from '../../domain/errors/application.error';
 import { ProductNotFoundError } from '../../domain/errors/product-not-found.error';
 import { StockUpdateError } from '../../domain/errors/stock-update.error';
@@ -56,15 +55,13 @@ export class ProcessPaymentUseCase {
 
       const transaction = transactionResult.value;
 
-      // 2. Validate transaction state
+      // 2. Check for idempotency - if transaction is not pending, return existing result
       if (transaction.status !== TransactionStatus.PENDING) {
-        logger.warn('Invalid transaction state for payment', {
+        logger.info('Transaction already processed (idempotency)', {
           transactionId: transaction.id,
           currentStatus: transaction.status,
         });
-        return Result.fail(
-          new InvalidStateTransitionError(transaction.status, TransactionStatus.PENDING)
-        );
+        return Result.ok(PaymentResultDto.fromEntity(transaction));
       }
 
       // 3. Retrieve product to verify stock availability
@@ -234,11 +231,54 @@ export class ProcessPaymentUseCase {
             )
           );
         }
-      } else {
-        // PENDING status - keep transaction as pending but store external payment ID
-        logger.info('Payment pending, stock unchanged', {
+      } else if (payment.status === 'PENDING') {
+        // PENDING status - reserve stock immediately to prevent overselling
+        logger.info('Payment pending, reserving stock', {
           transactionId: transaction.id,
           externalPaymentId: payment.transactionId,
+          productId: product.id,
+          currentStock: product.stock,
+        });
+
+        // Reserve stock atomically at database level
+        const reserveStockResult = await this.productRepository.reserveStock(product.id, 1);
+        if (reserveStockResult.isFailure) {
+          logger.error('Failed to reserve stock for pending payment', {
+            transactionId: transaction.id,
+            productId: product.id,
+            error: reserveStockResult.error.message,
+          });
+          return Result.fail(
+            new StockUpdateError(
+              `Failed to reserve stock: ${reserveStockResult.error.message}`,
+              {
+                transactionId: transaction.id,
+                productId: product.id,
+              }
+            )
+          );
+        }
+
+        logger.info('Stock reserved successfully for pending payment', {
+          transactionId: transaction.id,
+          productId: product.id,
+        });
+
+        const setIdResult = transaction.setExternalPaymentId(payment.transactionId);
+        if (setIdResult.isFailure) {
+          return Result.fail(
+            new PaymentProcessingError(
+              `Failed to set external payment ID: ${setIdResult.error.message}`,
+              { transactionId: transaction.id, paymentId: payment.transactionId }
+            )
+          );
+        }
+      } else {
+        // Other statuses - keep transaction as is
+        logger.info('Payment in other status, stock unchanged', {
+          transactionId: transaction.id,
+          externalPaymentId: payment.transactionId,
+          status: payment.status,
         });
 
         const setIdResult = transaction.setExternalPaymentId(payment.transactionId);

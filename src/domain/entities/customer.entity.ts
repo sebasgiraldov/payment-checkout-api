@@ -71,7 +71,7 @@ export class Customer {
       ? Result.ok(props.email)
       : Email.create(props.email);
     if (emailResult.isFailure) {
-      return Result.fail(emailResult.error);
+      return Result.fail(emailResult.error as DomainError);
     }
 
     // Validate phone format (Requirement 3.3)
@@ -79,7 +79,7 @@ export class Customer {
       ? Result.ok(props.phone)
       : Phone.create(props.phone);
     if (phoneResult.isFailure) {
-      return Result.fail(phoneResult.error);
+      return Result.fail(phoneResult.error as DomainError);
     }
 
     return Result.ok(

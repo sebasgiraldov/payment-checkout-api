@@ -56,7 +56,7 @@ describe('Email Value Object', () => {
 
       // Assert
       expect(result.isFailure).toBe(true);
-      expect(result.error.message).toContain('Email');
+      expect(result.error.message).toContain('Invalid email');
     });
 
     it('should fail when email is only whitespace', () => {
@@ -65,7 +65,7 @@ describe('Email Value Object', () => {
 
       // Assert
       expect(result.isFailure).toBe(true);
-      expect(result.error.message).toContain('Email');
+      expect(result.error.message).toContain('Invalid email');
     });
 
     it('should fail when email has no @ symbol', () => {

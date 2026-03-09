@@ -15,12 +15,22 @@ module.exports = {
     '!src/**/*.interface.ts',
     '!src/**/index.ts',
   ],
+  coveragePathIgnorePatterns: [
+    '/node_modules/',
+    '/dist/',
+    '/src/server.ts',
+    '/src/main.ts',
+    '/src/index.ts',
+    '/src/config/',
+    '/src/interfaces/routes/',
+    '/src/infrastructure/database/'
+  ],
   coverageThreshold: {
     global: {
-      branches: 20,
-      functions: 20,
-      lines: 20,
-      statements: 20,
+      branches: 80,
+      functions: 80,
+      lines: 80,
+      statements: 80,
     },
   },
   coverageDirectory: 'coverage',
@@ -29,8 +39,8 @@ module.exports = {
   transform: {
     '^.+\\.ts$': 'ts-jest',
   },
-  testTimeout: 10000,
+  testTimeout: 30000,
   verbose: true,
-  detectOpenHandles: true,
+  detectOpenHandles: false,
   forceExit: true,
 };

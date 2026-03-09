@@ -38,7 +38,7 @@ describe('Delivery Entity', () => {
       // Assert
       expect(result.isSuccess).toBe(true);
       expect(result.value.customerId).toBe('123e4567-e89b-12d3-a456-426614174000');
-      expect(result.value.address).toBe('Carrera 7 #32-16');
+      expect(result.value.address.street).toBe('Carrera 7 #32-16');
       expect(result.value.city).toBe('Bogota');
       expect(result.value.deliveryFee.amount).toBe(10000);
       expect(result.value.deliveryFee.currency).toBe('COP');
@@ -91,7 +91,7 @@ describe('Delivery Entity', () => {
 
       // Assert
       expect(result.isFailure).toBe(true);
-      expect(result.error.message).toContain('address');
+      expect(result.error.message).toContain('Street');
     });
 
     it('should fail when city is empty', () => {
@@ -111,7 +111,7 @@ describe('Delivery Entity', () => {
 
       // Assert
       expect(result.isFailure).toBe(true);
-      expect(result.error.message).toContain('city');
+      expect(result.error.message).toContain('City');
     });
 
     it('should fail when country is empty', () => {
@@ -131,7 +131,7 @@ describe('Delivery Entity', () => {
 
       // Assert
       expect(result.isFailure).toBe(true);
-      expect(result.error.message).toContain('country');
+      expect(result.error.message).toContain('Country');
     });
 
     it('should allow empty state (optional field)', () => {

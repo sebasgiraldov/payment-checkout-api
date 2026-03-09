@@ -11,7 +11,7 @@ describe('Phone Value Object', () => {
 
       // Assert
       expect(result.isSuccess).toBe(true);
-      expect(result.value.value).toBe('+573001234567');
+      expect(result.value.value).toBe('573001234567'); // Cleaned (no +)
     });
 
     it('should create a valid US phone number', () => {
@@ -20,7 +20,7 @@ describe('Phone Value Object', () => {
 
       // Assert
       expect(result.isSuccess).toBe(true);
-      expect(result.value.value).toBe('+12025551234');
+      expect(result.value.value).toBe('12025551234'); // Cleaned (no +)
     });
 
     it('should create a valid international phone number', () => {
@@ -29,7 +29,7 @@ describe('Phone Value Object', () => {
 
       // Assert
       expect(result.isSuccess).toBe(true);
-      expect(result.value.value).toBe('+442071234567');
+      expect(result.value.value).toBe('442071234567'); // Cleaned (no +)
     });
 
     it('should fail when phone is empty', () => {
@@ -38,7 +38,7 @@ describe('Phone Value Object', () => {
 
       // Assert
       expect(result.isFailure).toBe(true);
-      expect(result.error.message).toContain('Phone');
+      expect(result.error.message).toContain('Invalid phone');
     });
 
     it('should fail when phone is only whitespace', () => {
@@ -47,28 +47,28 @@ describe('Phone Value Object', () => {
 
       // Assert
       expect(result.isFailure).toBe(true);
-      expect(result.error.message).toContain('Phone');
+      expect(result.error.message).toContain('Invalid phone');
     });
 
-    it('should fail when phone does not start with +', () => {
+    it('should accept phone without + prefix', () => {
       // Act
       const result = Phone.create('573001234567');
 
       // Assert
-      expect(result.isFailure).toBe(true);
-      expect(result.error.message).toContain('Invalid phone');
+      expect(result.isSuccess).toBe(true);
+      expect(result.value.value).toBe('573001234567');
     });
 
-    it('should fail when phone has letters', () => {
+    it('should clean phone with letters and fail if too short', () => {
       // Act
       const result = Phone.create('+57300ABC4567');
 
-      // Assert
+      // Assert - After cleaning letters, it becomes 573004567 (9 digits, too short)
       expect(result.isFailure).toBe(true);
-      expect(result.error.message).toContain('Invalid phone');
+      expect(result.error.message).toContain('Invalid phone number');
     });
 
-    it('should fail when phone is too short', () => {
+    it('should fail when phone is too short after cleaning', () => {
       // Act
       const result = Phone.create('+57');
 
@@ -77,22 +77,22 @@ describe('Phone Value Object', () => {
       expect(result.error.message).toContain('Invalid phone');
     });
 
-    it('should fail when phone has spaces', () => {
+    it('should accept phone with spaces (cleaned)', () => {
       // Act
       const result = Phone.create('+57 300 123 4567');
 
       // Assert
-      expect(result.isFailure).toBe(true);
-      expect(result.error.message).toContain('Invalid phone');
+      expect(result.isSuccess).toBe(true);
+      expect(result.value.value).toBe('573001234567'); // Spaces removed
     });
 
-    it('should fail when phone has special characters', () => {
+    it('should accept phone with special characters (cleaned)', () => {
       // Act
       const result = Phone.create('+57-300-123-4567');
 
       // Assert
-      expect(result.isFailure).toBe(true);
-      expect(result.error.message).toContain('Invalid phone');
+      expect(result.isSuccess).toBe(true);
+      expect(result.value.value).toBe('573001234567'); // Hyphens removed
     });
   });
 

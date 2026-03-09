@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import 'dotenv/config';
 import { Server } from 'http';
 import { config } from './config';

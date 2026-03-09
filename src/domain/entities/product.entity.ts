@@ -145,7 +145,7 @@ export class Product {
 
     // Decrease stock (Requirement 2.2)
     this._stock -= quantity;
-    return Result.ok(undefined);
+    return Result.ok(null as any);
   }
 
   /**
@@ -166,6 +166,6 @@ export class Product {
 
     // Increase stock
     this._stock += quantity;
-    return Result.ok(undefined);
+    return Result.ok(null as any);
   }
 }

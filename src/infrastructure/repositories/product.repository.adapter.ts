@@ -164,7 +164,7 @@ export class ProductRepositoryAdapter implements IProductRepository {
         },
       });
 
-      return Result.ok(undefined);
+      return Result.ok(null as any);
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2025') {
@@ -180,6 +180,61 @@ export class ProductRepositoryAdapter implements IProductRepository {
         new RepositoryError(`Failed to update product stock: ${(error as Error).message}`, {
           productId,
           newStock,
+          error: error instanceof Error ? error.message : String(error),
+        })
+      );
+    }
+  }
+
+  /**
+   * Atomically reserves stock for a product using database-level conditional update
+   * Prevents race conditions and overselling by using Prisma's atomic operations
+   *
+   * @param productId - The product UUID
+   * @param quantity - The quantity to reserve
+   * @returns Result indicating success or RepositoryError if insufficient stock
+   *
+   * **Validates: Requirements 2.2, 2.3**
+   */
+  async reserveStock(productId: string, quantity: number): Promise<Result<void, RepositoryError>> {
+    try {
+      // Atomic update: only succeeds if stock >= quantity
+      await this.prisma.product.update({
+        where: {
+          id: productId,
+          stock: {
+            gte: quantity,
+          },
+        },
+        data: {
+          stock: {
+            decrement: quantity,
+          },
+          updatedAt: new Date(),
+        },
+      });
+
+      return Result.ok(null as any);
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2025') {
+          // Record not found - either product doesn't exist or stock is insufficient
+          return Result.fail(
+            new RepositoryError(
+              `Cannot reserve stock: Product ${productId} not found or insufficient stock`,
+              {
+                productId,
+                requestedQuantity: quantity,
+              }
+            )
+          );
+        }
+      }
+
+      return Result.fail(
+        new RepositoryError(`Failed to reserve product stock: ${(error as Error).message}`, {
+          productId,
+          quantity,
           error: error instanceof Error ? error.message : String(error),
         })
       );
