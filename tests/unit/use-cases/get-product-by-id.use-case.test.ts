@@ -22,6 +22,7 @@ describe('GetProductByIdUseCase', () => {
       save: jest.fn(),
       update: jest.fn(),
       updateStock: jest.fn(),
+      reserveStock: jest.fn(),
     };
 
     useCase = new GetProductByIdUseCase(mockProductRepository);

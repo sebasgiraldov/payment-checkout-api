@@ -3,6 +3,7 @@ import { PaymentController } from '../../../src/interfaces/controllers/payment.c
 import { ProcessPaymentUseCase } from '../../../src/application/use-cases/process-payment.use-case';
 import { Result } from '../../../src/shared/result';
 import { PaymentResultDto } from '../../../src/application/dtos/transaction.dto';
+import { TransactionStatus } from '../../../src/domain/entities/transaction.entity';
 
 describe('PaymentController', () => {
   let controller: PaymentController;
@@ -48,12 +49,13 @@ describe('PaymentController', () => {
     it('should return 200 with payment result when payment is APPROVED', async () => {
       const paymentResult: PaymentResultDto = {
         transactionId: 'trans-123',
-        status: 'APPROVED',
+        status: TransactionStatus.APPROVED,
         amount: 100000,
         currency: 'COP',
         externalPaymentId: 'wompi-123',
         message: 'Payment approved',
         createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
       mockUseCase.execute.mockResolvedValue(Result.ok(paymentResult));
@@ -78,12 +80,13 @@ describe('PaymentController', () => {
     it('should return 200 with payment result when payment is DECLINED', async () => {
       const paymentResult: PaymentResultDto = {
         transactionId: 'trans-123',
-        status: 'DECLINED',
+        status: TransactionStatus.DECLINED,
         amount: 100000,
         currency: 'COP',
         externalPaymentId: 'wompi-123',
         message: 'Payment declined',
         createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
       mockUseCase.execute.mockResolvedValue(Result.ok(paymentResult));
@@ -107,12 +110,13 @@ describe('PaymentController', () => {
     it('should return 200 with payment result when payment is PENDING', async () => {
       const paymentResult: PaymentResultDto = {
         transactionId: 'trans-123',
-        status: 'PENDING',
+        status: TransactionStatus.PENDING,
         amount: 100000,
         currency: 'COP',
         externalPaymentId: 'wompi-123',
         message: 'Payment pending',
         createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
       mockUseCase.execute.mockResolvedValue(Result.ok(paymentResult));
@@ -151,12 +155,13 @@ describe('PaymentController', () => {
     it('should mask card number in logs', async () => {
       const paymentResult: PaymentResultDto = {
         transactionId: 'trans-123',
-        status: 'APPROVED',
+        status: TransactionStatus.APPROVED,
         amount: 100000,
         currency: 'COP',
         externalPaymentId: 'wompi-123',
         message: 'Payment approved',
         createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
       mockUseCase.execute.mockResolvedValue(Result.ok(paymentResult));
@@ -187,12 +192,13 @@ describe('PaymentController', () => {
 
       const paymentResult: PaymentResultDto = {
         transactionId: 'trans-123',
-        status: 'APPROVED',
+        status: TransactionStatus.APPROVED,
         amount: 100000,
         currency: 'COP',
         externalPaymentId: 'wompi-123',
         message: 'Payment approved',
         createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
       mockUseCase.execute.mockResolvedValue(Result.ok(paymentResult));

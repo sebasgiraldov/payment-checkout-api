@@ -111,7 +111,7 @@ describe('TransactionController', () => {
   describe('getTransactionById', () => {
     it('should return 200 with transaction data', async () => {
       const transactionDto: TransactionDto = {
-        id: 'trans-123',
+        id: '123e4567-e89b-12d3-a456-426614174000',
         productId: 'prod-123',
         customerId: 'cust-123',
         deliveryId: 'del-123',
@@ -127,7 +127,7 @@ describe('TransactionController', () => {
         updatedAt: new Date(),
       };
 
-      mockRequest.params = { id: 'trans-123' };
+      mockRequest.params = { id: '123e4567-e89b-12d3-a456-426614174000' };
       mockGetByIdUseCase.execute.mockResolvedValue(Result.ok(transactionDto));
 
       await controller.getTransactionById(

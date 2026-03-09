@@ -34,6 +34,7 @@ describe('ProcessPaymentUseCase', () => {
       save: jest.fn(),
       update: jest.fn(),
       updateStock: jest.fn(),
+      reserveStock: jest.fn(),
     };
 
     mockPaymentGateway = {
