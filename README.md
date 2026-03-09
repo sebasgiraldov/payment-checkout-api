@@ -572,6 +572,16 @@ This script tests all endpoints in sequence and displays the results.
 
 This project includes comprehensive test coverage with unit tests, integration tests, and property-based tests.
 
+### Test Coverage
+
+![Test Coverage](./coverage/coverage-summary.png)
+
+Current coverage metrics:
+- **Statements**: 68%+
+- **Branches**: 50%+
+- **Functions**: 68%+
+- **Lines**: 68%+
+
 ### Run All Tests
 
 ```bash
@@ -601,6 +611,8 @@ npm run test:coverage
 
 Coverage reports will be generated in the `coverage/` directory. Open `coverage/lcov-report/index.html` in your browser to view the detailed report.
 
+![Coverage Report](./coverage/lcov-report/index.html)
+
 ### Watch Mode (Development)
 
 Run tests in watch mode for rapid feedback:
@@ -615,7 +627,10 @@ tests/
 ├── unit/              # Unit tests for domain logic
 │   ├── entities/      # Entity tests
 │   ├── value-objects/ # Value object tests
-│   └── use-cases/     # Use case tests
+│   ├── use-cases/     # Use case tests
+│   ├── middleware/    # Middleware tests
+│   ├── controllers/   # Controller tests
+│   └── infrastructure/# Infrastructure adapter tests
 ├── integration/       # Integration tests
 │   ├── api/           # API endpoint tests
 │   └── database/      # Database integration tests
@@ -630,6 +645,33 @@ This project uses property-based testing with `fast-check` to verify correctness
 - Transaction amounts are always correct
 - State transitions are always valid
 - Payment operations are idempotent
+
+### Test Coverage Details
+
+To view detailed coverage by file:
+
+1. Run tests with coverage:
+   ```bash
+   npm run test:coverage
+   ```
+
+2. Open the HTML report:
+   ```bash
+   # Windows
+   start coverage/index.html
+   
+   # macOS
+   open coverage/index.html
+   
+   # Linux
+   xdg-open coverage/index.html
+   ```
+
+The coverage report shows:
+- Line-by-line coverage highlighting
+- Uncovered branches and statements
+- Function coverage statistics
+- File-by-file breakdown
 
 ## Code Quality
 
