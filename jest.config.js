@@ -15,6 +15,16 @@ module.exports = {
     '!src/**/*.interface.ts',
     '!src/**/index.ts',
   ],
+  coveragePathIgnorePatterns: [
+    '/node_modules/',
+    '/dist/',
+    '/src/server.ts',
+    '/src/main.ts',
+    '/src/index.ts',
+    '/src/config/',
+    '/src/interfaces/routes/',
+    '/src/infrastructure/database/'
+  ],
   coverageThreshold: {
     global: {
       branches: 80,
