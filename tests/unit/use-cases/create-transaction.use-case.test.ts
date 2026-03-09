@@ -8,9 +8,9 @@ import { Customer } from '../../../src/domain/entities/customer.entity';
 import { Delivery } from '../../../src/domain/entities/delivery.entity';
 import { Transaction } from '../../../src/domain/entities/transaction.entity';
 import { Money } from '../../../src/domain/value-objects/money.value-object';
+import { RepositoryError } from '../../../src/domain/errors/repository.error';
 import { Email } from '../../../src/domain/value-objects/email.value-object';
 import { Phone } from '../../../src/domain/value-objects/phone.value-object';
-import { Address } from '../../../src/domain/value-objects/address.value-object';
 import { Result } from '../../../src/shared/result';
 import { CreateTransactionDto } from '../../../src/application/dtos/transaction.dto';
 import { ProductNotFoundError } from '../../../src/application/errors/application.error';
@@ -104,21 +104,13 @@ describe('CreateTransactionUseCase', () => {
         createdAt: new Date(),
       });
 
-      const addressResult = Address.create({
-        street: dto.deliveryAddress,
-        city: dto.deliveryCity,
-        state: dto.deliveryState,
-        country: dto.deliveryCountry,
-        postalCode: dto.deliveryPostalCode,
-      });
-
       const deliveryFeeResult = Money.create(dto.deliveryFee, dto.currency);
       const deliveryResult = Delivery.create({
         id: 'delivery-id',
         customerId: customerResult.value.id,
         address: dto.deliveryAddress,
         city: dto.deliveryCity,
-        state: dto.deliveryState,
+        state: dto.deliveryState || '',
         country: dto.deliveryCountry,
         postalCode: dto.deliveryPostalCode,
         deliveryFee: deliveryFeeResult.value,
@@ -176,7 +168,7 @@ describe('CreateTransactionUseCase', () => {
       };
 
       mockProductRepository.findById.mockResolvedValue(
-        Result.fail(new Error('Product not found'))
+        Result.fail(new RepositoryError('Product not found'))
       );
 
       // Act
@@ -225,7 +217,7 @@ describe('CreateTransactionUseCase', () => {
 
       // Assert
       expect(result.isFailure).toBe(true);
-      expect(result.error.message).toContain('insufficient stock');
+      expect(result.error.message).toContain('Insufficient stock');
       expect(mockProductRepository.findById).toHaveBeenCalledWith(dto.productId);
       expect(mockCustomerRepository.findOrCreate).not.toHaveBeenCalled();
     });

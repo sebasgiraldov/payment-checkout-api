@@ -6,7 +6,6 @@ import { IPaymentGateway, PaymentRequest } from '../../domain/services/payment-g
 import { TransactionStatus } from '../../domain/entities/transaction.entity';
 import { TransactionNotFoundError } from '../../domain/errors/transaction-not-found.error';
 import { PaymentProcessingError } from '../../domain/errors/payment-processing.error';
-import { InvalidStateTransitionError } from '../../domain/errors/invalid-state-transition.error';
 import { ApplicationError } from '../../domain/errors/application.error';
 import { ProductNotFoundError } from '../../domain/errors/product-not-found.error';
 import { StockUpdateError } from '../../domain/errors/stock-update.error';
@@ -56,15 +55,13 @@ export class ProcessPaymentUseCase {
 
       const transaction = transactionResult.value;
 
-      // 2. Validate transaction state
+      // 2. Check for idempotency - if transaction is not pending, return existing result
       if (transaction.status !== TransactionStatus.PENDING) {
-        logger.warn('Invalid transaction state for payment', {
+        logger.info('Transaction already processed (idempotency)', {
           transactionId: transaction.id,
           currentStatus: transaction.status,
         });
-        return Result.fail(
-          new InvalidStateTransitionError(transaction.status, TransactionStatus.PENDING)
-        );
+        return Result.ok(PaymentResultDto.fromEntity(transaction));
       }
 
       // 3. Retrieve product to verify stock availability

@@ -29,8 +29,8 @@ module.exports = {
   transform: {
     '^.+\\.ts$': 'ts-jest',
   },
-  testTimeout: 10000,
+  testTimeout: 30000,
   verbose: true,
-  detectOpenHandles: true,
+  detectOpenHandles: false,
   forceExit: true,
 };

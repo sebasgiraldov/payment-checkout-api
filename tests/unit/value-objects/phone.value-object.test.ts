@@ -63,9 +63,9 @@ describe('Phone Value Object', () => {
       // Act
       const result = Phone.create('+57300ABC4567');
 
-      // Assert - After cleaning letters, it becomes 573004567 (10 digits, valid)
-      expect(result.isSuccess).toBe(true);
-      expect(result.value.value).toBe('573004567');
+      // Assert - After cleaning letters, it becomes 573004567 (9 digits, too short)
+      expect(result.isFailure).toBe(true);
+      expect(result.error.message).toContain('Invalid phone number');
     });
 
     it('should fail when phone is too short after cleaning', () => {

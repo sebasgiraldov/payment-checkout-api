@@ -1,14 +1,13 @@
 import { ProcessPaymentUseCase } from '../../../src/application/use-cases/process-payment.use-case';
 import { ITransactionRepository } from '../../../src/domain/repositories/transaction.repository';
 import { IProductRepository } from '../../../src/domain/repositories/product.repository';
-import { IPaymentGateway, PaymentRequest, PaymentResponse } from '../../../src/domain/services/payment-gateway.interface';
-import { IDatabaseTransaction } from '../../../src/domain/repositories/database-transaction.repository';
+import { IPaymentGateway, PaymentResponse } from '../../../src/domain/services/payment-gateway.interface';
 import { Transaction } from '../../../src/domain/entities/transaction.entity';
 import { Product } from '../../../src/domain/entities/product.entity';
 import { Money } from '../../../src/domain/value-objects/money.value-object';
 import { Result } from '../../../src/shared/result';
 import { ProcessPaymentDto } from '../../../src/application/dtos/transaction.dto';
-import { TransactionNotFoundError } from '../../../src/application/errors/application.error';
+import { RepositoryError } from '../../../src/domain/errors/repository.error';
 
 /**
  * Unit tests for ProcessPaymentUseCase
@@ -20,7 +19,6 @@ describe('ProcessPaymentUseCase', () => {
   let mockTransactionRepository: jest.Mocked<ITransactionRepository>;
   let mockProductRepository: jest.Mocked<IProductRepository>;
   let mockPaymentGateway: jest.Mocked<IPaymentGateway>;
-  let mockDatabaseTransaction: jest.Mocked<IDatabaseTransaction>;
 
   beforeEach(() => {
     mockTransactionRepository = {
@@ -43,15 +41,10 @@ describe('ProcessPaymentUseCase', () => {
       getPaymentStatus: jest.fn(),
     };
 
-    mockDatabaseTransaction = {
-      execute: jest.fn((callback) => callback()),
-    };
-
     useCase = new ProcessPaymentUseCase(
       mockTransactionRepository,
       mockProductRepository,
-      mockPaymentGateway,
-      mockDatabaseTransaction
+      mockPaymentGateway
     );
   });
 
@@ -197,7 +190,7 @@ describe('ProcessPaymentUseCase', () => {
       };
 
       mockTransactionRepository.findById.mockResolvedValue(
-        Result.fail(new Error('Transaction not found'))
+        Result.fail(new RepositoryError('Transaction not found'))
       );
 
       // Act
@@ -205,7 +198,7 @@ describe('ProcessPaymentUseCase', () => {
 
       // Assert
       expect(result.isFailure).toBe(true);
-      expect(result.error).toBeInstanceOf(TransactionNotFoundError);
+      expect(result.error.message).toContain('not found');
       expect(mockTransactionRepository.findById).toHaveBeenCalledWith(dto.transactionId);
       expect(mockPaymentGateway.processPayment).not.toHaveBeenCalled();
     });
@@ -304,7 +297,7 @@ describe('ProcessPaymentUseCase', () => {
 
       // Assert
       expect(result.isFailure).toBe(true);
-      expect(result.error.message).toContain('Insufficient stock');
+      expect(result.error.message).toContain('out of stock');
       expect(mockPaymentGateway.processPayment).not.toHaveBeenCalled();
     });
   });

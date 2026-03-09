@@ -1,9 +1,11 @@
 import { ProcessPaymentUseCase } from '../../../src/application/use-cases/process-payment.use-case';
 import { ProcessPaymentDto } from '../../../src/application/dtos/transaction.dto';
-import { Transaction, TransactionStatus } from '../../../src/domain/entities/transaction.entity';
+import { Transaction } from '../../../src/domain/entities/transaction.entity';
 import { Product } from '../../../src/domain/entities/product.entity';
 import { Money } from '../../../src/domain/value-objects/money.value-object';
 import { Result } from '../../../src/shared/result';
+import { RepositoryError } from '../../../src/domain/errors/repository.error';
+import { PaymentError } from '../../../src/domain/errors/payment.error';
 
 /**
  * Comprehensive unit tests for ProcessPaymentUseCase
@@ -237,7 +239,7 @@ describe('ProcessPaymentUseCase - Complete Tests', () => {
       };
 
       mockTransactionRepository.findById.mockResolvedValue(
-        Result.fail(new Error('Transaction not found'))
+        Result.fail(new RepositoryError('Transaction not found'))
       );
 
       // Act
@@ -277,7 +279,7 @@ describe('ProcessPaymentUseCase - Complete Tests', () => {
 
       mockTransactionRepository.findById.mockResolvedValue(Result.ok(transaction));
       mockProductRepository.findById.mockResolvedValue(
-        Result.fail(new Error('Product not found'))
+        Result.fail(new RepositoryError('Product not found'))
       );
 
       // Act
@@ -335,7 +337,7 @@ describe('ProcessPaymentUseCase - Complete Tests', () => {
       expect(mockPaymentGateway.processPayment).not.toHaveBeenCalled();
     });
 
-    it('should fail when transaction is not in PENDING status', async () => {
+    it('should handle idempotency - return existing result for non-pending transaction', async () => {
       // Arrange
       const dto: ProcessPaymentDto = {
         transactionId: 'trans-123',
@@ -370,9 +372,10 @@ describe('ProcessPaymentUseCase - Complete Tests', () => {
       // Act
       const result = await useCase.execute(dto);
 
-      // Assert
-      expect(result.isFailure).toBe(true);
-      expect(result.error.message).toContain('state');
+      // Assert - Should return success with existing transaction (idempotency)
+      expect(result.isSuccess).toBe(true);
+      expect(result.value.status).toBe('APPROVED');
+      expect(mockPaymentGateway.processPayment).not.toHaveBeenCalled();
     });
 
     it('should fail when payment gateway returns error', async () => {
@@ -413,7 +416,7 @@ describe('ProcessPaymentUseCase - Complete Tests', () => {
       mockTransactionRepository.findById.mockResolvedValue(Result.ok(transaction));
       mockProductRepository.findById.mockResolvedValue(Result.ok(product));
       mockPaymentGateway.processPayment.mockResolvedValue(
-        Result.fail(new Error('Payment gateway error'))
+        Result.fail(new PaymentError('Payment gateway error'))
       );
       mockTransactionRepository.update.mockResolvedValue(Result.ok(transaction));
 

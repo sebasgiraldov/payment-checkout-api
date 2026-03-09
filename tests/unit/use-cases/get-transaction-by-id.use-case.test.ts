@@ -1,6 +1,6 @@
 import { GetTransactionByIdUseCase } from '../../../src/application/use-cases/get-transaction-by-id.use-case';
 import { ITransactionRepository } from '../../../src/domain/repositories/transaction.repository';
-import { Transaction, TransactionStatus } from '../../../src/domain/entities/transaction.entity';
+import { Transaction } from '../../../src/domain/entities/transaction.entity';
 import { Money } from '../../../src/domain/value-objects/money.value-object';
 import { Result } from '../../../src/shared/result';
 import { RepositoryError } from '../../../src/domain/errors/repository.error';
